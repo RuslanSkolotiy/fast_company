@@ -1,14 +1,17 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import Users from "./components/users"
 import api from "./api"
-import SearchStatus from "./components/searchStatus"
 
 const App = () => {
-    const [users, setUsers] = useState(api.users.fetchAll())
+    const [users, setUsers] = useState([])
 
     const handleDelete = (userId) => {
         setUsers(users.filter((user) => user._id !== userId))
     }
+
+    useEffect(() => {
+        api.users.fetchAll().then((result) => setUsers(result))
+    }, [])
 
     const handleonBookmarkToggle = (userId) => {
         const newUsers = [...users]
@@ -19,7 +22,6 @@ const App = () => {
 
     return (
         <>
-            <SearchStatus usersCount={users.length} />
             <Users
                 users={users}
                 onDelete={handleDelete}
