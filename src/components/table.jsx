@@ -21,7 +21,7 @@ Table.propTypes = {
     onSort: PropTypes.func.isRequired,
     selectedSort: PropTypes.object.isRequired,
     columns: PropTypes.object.isRequired,
-    children: PropTypes.object
+    children: PropTypes.array
 }
 
 export default Table

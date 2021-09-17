@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react"
 import Pagination from "./pagination"
 import { paginate } from "../utils/paginate"
-import PropTypes from "prop-types"
 import GroupList from "./groupList"
 import api from "../api"
 import SearchStatus from "./searchStatus"
@@ -155,12 +154,6 @@ const Users = () => {
             </div>
         </div>
     )
-}
-
-Users.propTypes = {
-    users: PropTypes.array.isRequired,
-    onBookmarkToggle: PropTypes.func.isRequired,
-    onDelete: PropTypes.func.isRequired
 }
 
 export default Users
