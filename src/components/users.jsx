@@ -1,18 +1,40 @@
 import React, { useState, useEffect } from "react"
-import User from "./user"
 import Pagination from "./pagination"
 import { paginate } from "../utils/paginate"
 import PropTypes from "prop-types"
 import GroupList from "./groupList"
 import api from "../api"
 import SearchStatus from "./searchStatus"
-// import _ from "lodash"
+import UserTable from "./usersTable"
+import _ from "lodash"
+import Bookmark from "./bookmark"
+import QualitiesList from "./qualitiesList"
 
-const Users = ({ users: allUsers, ...rest }) => {
-    const onPage = 2
+const Users = () => {
+    const [users, setUsers] = useState([])
+
+    const onDelete = (userId) => {
+        setUsers(users.filter((user) => user._id !== userId))
+    }
+
+    useEffect(() => {
+        api.users.fetchAll().then((result) => setUsers(result))
+    }, [])
+
+    const onBookmarkToggle = (userId) => {
+        const newUsers = [...users]
+        const userIndex = newUsers.findIndex((user) => user._id === userId)
+        newUsers[userIndex].marked = !newUsers[userIndex].marked
+            ? true
+            : undefined
+        setUsers(newUsers)
+    }
+
+    const onPage = 6
     const [currentPage, setCurrentPage] = useState(1)
     const [professions, setProfessions] = useState()
     const [selectedProf, setSelectedProf] = useState()
+    const [sortBy, setSortBy] = useState({ sort: "name", order: "asc" })
 
     useEffect(() => {
         setCurrentPage(1)
@@ -23,11 +45,14 @@ const Users = ({ users: allUsers, ...rest }) => {
     }, [])
 
     const filteredUsers = selectedProf
-        ? allUsers.filter((user) => user.profession._id === selectedProf._id) // ? allUsers.filter((user) => _.isEqual(user.profession, selectedProf))
-        : allUsers
+        ? users.filter((user) => user.profession._id === selectedProf._id) // ? allUsers.filter((user) => _.isEqual(user.profession, selectedProf))
+        : users
 
     const count = filteredUsers.length
-    const users = paginate(filteredUsers, onPage, currentPage)
+
+    const sortedUsers = _.orderBy(filteredUsers, sortBy.sort, sortBy.order)
+
+    const cropUsers = paginate(sortedUsers, onPage, currentPage)
 
     const onPageChange = (page) => {
         setCurrentPage(page)
@@ -37,9 +62,57 @@ const Users = ({ users: allUsers, ...rest }) => {
         setSelectedProf(item)
     }
 
+    const handleSort = (item) => {
+        setSortBy(item)
+    }
+
     const clearFilter = () => {
         setSelectedProf()
         setCurrentPage(1)
+    }
+
+    const columns = {
+        name: {
+            name: "Имя",
+            path: "name"
+        },
+        qualities: {
+            name: "Качества",
+            component: (user) => <QualitiesList qualities={user.qualities} />
+        },
+        profession: {
+            name: "Проффесия",
+            path: "profession.name"
+        },
+        completedMeetings: {
+            name: "Встретился, раз",
+            path: "completedMeetings"
+        },
+        rate: {
+            name: "Оценка",
+            path: "rate"
+        },
+        marked: {
+            name: "Избранное",
+            path: "marked",
+            component: (user) => (
+                <Bookmark user={user} onToggle={onBookmarkToggle} />
+            )
+        },
+        delete: {
+            name: "",
+            component: (user) => (
+                <button
+                    onClick={() => {
+                        onDelete(user._id)
+                    }}
+                    data-id={user._id}
+                    className="btn btn-danger"
+                >
+                    Delete
+                </button>
+            )
+        }
     }
 
     return (
@@ -62,24 +135,12 @@ const Users = ({ users: allUsers, ...rest }) => {
             <div className="d-flex flex-column w-100">
                 <SearchStatus usersCount={count} />
                 {count > 0 && (
-                    <table className="table">
-                        <thead>
-                            <tr>
-                                <th scope="col">Имя</th>
-                                <th scope="col">Качества</th>
-                                <th scope="col">Проффесия</th>
-                                <th scope="col">Встретился, раз</th>
-                                <th scope="col">Оценка</th>
-                                <th scope="col">Избранное</th>
-                                <th scope="col"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {users.map((user) => (
-                                <User user={user} {...rest} key={user._id} />
-                            ))}
-                        </tbody>
-                    </table>
+                    <UserTable
+                        users={cropUsers}
+                        onSort={handleSort}
+                        selectedSort={sortBy}
+                        columns={columns}
+                    />
                 )}
                 <div className="d-flex justify-content-center">
                     <Pagination
@@ -97,7 +158,9 @@ const Users = ({ users: allUsers, ...rest }) => {
 }
 
 Users.propTypes = {
-    users: PropTypes.array.isRequired
+    users: PropTypes.array.isRequired,
+    onBookmarkToggle: PropTypes.func.isRequired,
+    onDelete: PropTypes.func.isRequired
 }
 
 export default Users
