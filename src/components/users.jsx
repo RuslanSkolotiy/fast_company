@@ -8,9 +8,10 @@ import UserTable from "./usersTable"
 import _ from "lodash"
 import Bookmark from "./bookmark"
 import QualitiesList from "./qualitiesList"
+import { Link } from "react-router-dom"
 
 const Users = () => {
-    const [users, setUsers] = useState([])
+    const [users, setUsers] = useState()
 
     const onDelete = (userId) => {
         setUsers(users.filter((user) => user._id !== userId))
@@ -43,6 +44,8 @@ const Users = () => {
         api.professions.fetchAll().then((result) => setProfessions(result))
     }, [])
 
+    if (!users) return "Loding..."
+
     const filteredUsers = selectedProf
         ? users.filter((user) => user.profession._id === selectedProf._id) // ? allUsers.filter((user) => _.isEqual(user.profession, selectedProf))
         : users
@@ -73,7 +76,10 @@ const Users = () => {
     const columns = {
         name: {
             name: "Имя",
-            path: "name"
+            path: "name",
+            component: (user) => (
+                <Link to={`/users/${user._id}`}>{user.name}</Link>
+            )
         },
         qualities: {
             name: "Качества",
@@ -115,44 +121,46 @@ const Users = () => {
     }
 
     return (
-        <div className="d-flex">
-            {professions && (
-                <div className="d-flex flex-column flex-shrink-0 p-3">
-                    <GroupList
-                        selectedItem={selectedProf}
-                        items={professions}
-                        onItemSelect={handleProfessionSelect}
-                    />
-                    <button
-                        onClick={() => clearFilter()}
-                        className="btn btn-secondary mt-2"
-                    >
-                        Очистить
-                    </button>
-                </div>
-            )}
-            <div className="d-flex flex-column w-100">
-                <SearchStatus usersCount={count} />
-                {count > 0 && (
-                    <UserTable
-                        users={cropUsers}
-                        onSort={handleSort}
-                        selectedSort={sortBy}
-                        columns={columns}
-                    />
+        <>
+            <div className="d-flex">
+                {professions && (
+                    <div className="d-flex flex-column flex-shrink-0 p-3">
+                        <GroupList
+                            selectedItem={selectedProf}
+                            items={professions}
+                            onItemSelect={handleProfessionSelect}
+                        />
+                        <button
+                            onClick={() => clearFilter()}
+                            className="btn btn-secondary mt-2"
+                        >
+                            Очистить
+                        </button>
+                    </div>
                 )}
-                <div className="d-flex justify-content-center">
-                    <Pagination
-                        {...{
-                            elementsCount: count,
-                            onPage: onPage,
-                            currentPage: currentPage,
-                            onPageChange: onPageChange
-                        }}
-                    />
+                <div className="d-flex flex-column w-100">
+                    <SearchStatus usersCount={count} />
+                    {count > 0 && (
+                        <UserTable
+                            users={cropUsers}
+                            onSort={handleSort}
+                            selectedSort={sortBy}
+                            columns={columns}
+                        />
+                    )}
+                    <div className="d-flex justify-content-center">
+                        <Pagination
+                            {...{
+                                elementsCount: count,
+                                onPage: onPage,
+                                currentPage: currentPage,
+                                onPageChange: onPageChange
+                            }}
+                        />
+                    </div>
                 </div>
             </div>
-        </div>
+        </>
     )
 }
 
