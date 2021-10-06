@@ -9,9 +9,11 @@ import _ from "lodash"
 import Bookmark from "./bookmark"
 import QualitiesList from "./qualitiesList"
 import { Link } from "react-router-dom"
+import SearchRow from "./SearchRow"
 
 const Users = () => {
     const [users, setUsers] = useState()
+    const [searchString, setSearchString] = useState("")
 
     const onDelete = (userId) => {
         setUsers(users.filter((user) => user._id !== userId))
@@ -46,9 +48,14 @@ const Users = () => {
 
     if (!users) return "Loding..."
 
-    const filteredUsers = selectedProf
+    let filteredUsers = selectedProf
         ? users.filter((user) => user.profession._id === selectedProf._id) // ? allUsers.filter((user) => _.isEqual(user.profession, selectedProf))
         : users
+
+    filteredUsers = filteredUsers.filter((item) => {
+        console.log(item.name)
+        return item.name.toLowerCase().includes(searchString.toLowerCase())
+    })
 
     const count = filteredUsers.length
 
@@ -62,6 +69,7 @@ const Users = () => {
 
     const handleProfessionSelect = (item) => {
         setSelectedProf(item)
+        resetSearchHadler()
     }
 
     const handleSort = (item) => {
@@ -120,6 +128,14 @@ const Users = () => {
         }
     }
 
+    const searchHadler = (value) => {
+        setSearchString(value)
+        clearFilter()
+    }
+    const resetSearchHadler = () => {
+        setSearchString("")
+    }
+
     return (
         <>
             <div className="d-flex">
@@ -140,6 +156,7 @@ const Users = () => {
                 )}
                 <div className="d-flex flex-column w-100">
                     <SearchStatus usersCount={count} />
+                    <SearchRow value={searchString} onSearch={searchHadler} />
                     {count > 0 && (
                         <UserTable
                             users={cropUsers}
