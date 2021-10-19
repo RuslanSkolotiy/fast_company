@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from "react"
 import PropTypes from "prop-types"
 import api from "../../../api"
-import Qualities from "../../ui/qualities"
 import { useHistory } from "react-router"
+import UserCard from "../../ui/userCard"
+import QualitiesCard from "../../ui/qualitiesCard"
+import MeetingsCard from "../../ui/meetingsCard"
+import { CommentsList, NewCommentForm } from "../../ui/comments"
 
 const UserPage = ({ id }) => {
     const [user, setUser] = useState()
+    const [comments, setComments] = useState([])
     const history = useHistory()
 
     // const allUsersHandle = () => {
@@ -14,25 +18,57 @@ const UserPage = ({ id }) => {
     const editUserHandle = () => {
         history.push("/users/" + id + "/edit")
     }
+    const onDeleteCommentHandler = (id) => {
+        api.comments.remove(id)
+        loadComments()
+    }
+    const onAddMessageHanler = (data) => {
+        api.comments.add(data)
+        loadComments()
+    }
+
+    const loadComments = () => {
+        api.comments.fetchCommentsForUser(id).then((result) => {
+            setComments(result)
+        })
+    }
 
     useEffect(() => {
         api.users.getById(id).then((result) => {
             setUser(result)
         })
+        loadComments()
     }, [])
 
     if (!user) return <>Loading...</>
 
     return (
         <>
-            <h2>{user.name}</h2>
-            <h3>Профессия: {user.profession.name}</h3>
-            <Qualities qualities={user.qualities} />
-            <div>completedMeetings: {user.completedMeetings}</div>
-            <h3>Rate: {user.rate}</h3>
-            <button onClick={editUserHandle} className="btn btn-secondary">
-                Edit
-            </button>
+            <div className="container">
+                <div className="row gutters-sm">
+                    <div className="col-md-4 mb-3">
+                        <UserCard
+                            user={user}
+                            onEditUserClick={editUserHandle}
+                        />
+                        <QualitiesCard qualities={user.qualities} />
+                        <MeetingsCard
+                            completedMeetings={user.completedMeetings}
+                        />
+                    </div>
+
+                    <div className="col-md-8">
+                        <NewCommentForm
+                            pageId={id}
+                            onAddMessage={onAddMessageHanler}
+                        />
+                        <CommentsList
+                            comments={comments}
+                            onDeleteComment={onDeleteCommentHandler}
+                        />
+                    </div>
+                </div>
+            </div>
         </>
     )
 }

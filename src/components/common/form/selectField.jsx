@@ -8,7 +8,8 @@ const SelectField = ({
     onChange,
     options,
     error,
-    defaultOption
+    defaultOption,
+    showValid
 }) => {
     const optionsArray =
         !Array.isArray(options) && typeof options === "object"
@@ -23,15 +24,17 @@ const SelectField = ({
         onChange({ name, value })
     }
 
+    const valid = showValid ? " is-valid" : ""
+
     return (
         <div className="mb-4">
-            <label htmlFor={name} className="form-label">
-                {label}
-            </label>
+            {label && (
+                <label htmlFor={name} className="form-label">
+                    {label}
+                </label>
+            )}
             <select
-                className={
-                    "form-select" + (!error ? " is-valid" : " is-invalid")
-                }
+                className={"form-select" + (!error ? valid : " is-invalid")}
                 name={name}
                 id={name}
                 value={value}
@@ -52,16 +55,18 @@ const SelectField = ({
 }
 SelectField.defaultProps = {
     type: "text",
-    defaultOption: ""
+    defaultOption: "",
+    showValid: false
 }
 SelectField.propTypes = {
-    label: PropTypes.string.isRequired,
+    label: PropTypes.string,
     name: PropTypes.string.isRequired,
     value: PropTypes.string.isRequired,
     onChange: PropTypes.func.isRequired,
     options: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
     error: PropTypes.string,
-    defaultOption: PropTypes.string
+    defaultOption: PropTypes.string,
+    showValid: PropTypes.bool
 }
 
 export default SelectField

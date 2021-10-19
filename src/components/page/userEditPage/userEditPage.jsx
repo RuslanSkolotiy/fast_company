@@ -27,13 +27,28 @@ const UserEditPage = ({ id }) => {
         api.qualities.fetchAll().then((result) => setQualities(result))
     }, [])
 
-    const validarotConfig = {}
+    const validarotConfig = {
+        name: {
+            isRequired: {
+                message: "Name is required"
+            }
+        },
+        email: {
+            isRequired: {
+                message: "Email is required"
+            },
+            isEmail: {
+                message: "Email is incorected"
+            }
+        }
+    }
 
     const validate = () => {
         const errors = validator(formData, validarotConfig)
         setErrors(errors)
         return Object.keys(errors).length === 0
     }
+    const isValid = Object.keys(errors).length === 0
 
     const changeHandler = ({ name, value }) => {
         if (name === "profession") {
@@ -53,8 +68,12 @@ const UserEditPage = ({ id }) => {
 
         if (validate()) {
             api.users.update(id, formData)
-            history.push("/users/" + id + "")
+            goBackHandler()
         }
+    }
+
+    const goBackHandler = () => {
+        history.push("/users/" + id + "")
     }
 
     if (!formData) return <>Loading...</>
@@ -62,6 +81,9 @@ const UserEditPage = ({ id }) => {
     return (
         <>
             <div className="container">
+                <button className="btn btn-primary" onClick={goBackHandler}>
+                    Go back
+                </button>
                 <form onSubmit={handleSubmit}>
                     <TextField
                         label="Name"
@@ -110,7 +132,12 @@ const UserEditPage = ({ id }) => {
                             value: quality._id
                         }))}
                     />
-                    <button className="btn btn-primary w-100">Save</button>
+                    <button
+                        disabled={!isValid}
+                        className="btn btn-primary w-100"
+                    >
+                        Save
+                    </button>
                 </form>
             </div>
         </>
