@@ -1,5 +1,5 @@
 import React from "react"
-import { countFormat } from "../lib"
+import { countFormat } from "../../lib"
 import PropTypes from "prop-types"
 
 const SearchStatus = ({ usersCount }) => {

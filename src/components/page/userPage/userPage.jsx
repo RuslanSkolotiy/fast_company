@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from "react"
 import PropTypes from "prop-types"
-import api from "../api"
-import QualitiesList from "./qualitiesList"
+import api from "../../../api"
+import Qualities from "../../ui/qualities"
 import { useHistory } from "react-router"
 
-const UserDescription = ({ id }) => {
+const UserPage = ({ id }) => {
     const [user, setUser] = useState()
     const history = useHistory()
 
-    const allUsersHandle = () => {
-        history.replace("/users")
+    // const allUsersHandle = () => {
+    //     history.replace("/users")
+    // }
+    const editUserHandle = () => {
+        history.push("/users/" + id + "/edit")
     }
 
     useEffect(() => {
@@ -24,16 +27,17 @@ const UserDescription = ({ id }) => {
         <>
             <h2>{user.name}</h2>
             <h3>Профессия: {user.profession.name}</h3>
-            <QualitiesList qualities={user.qualities} />
+            <Qualities qualities={user.qualities} />
             <div>completedMeetings: {user.completedMeetings}</div>
             <h3>Rate: {user.rate}</h3>
-            <button onClick={allUsersHandle} className='btn btn-secondary'>Все пользователи</button>
+            <button onClick={editUserHandle} className="btn btn-secondary">
+                Edit
+            </button>
         </>
     )
 }
-
-UserDescription.propTypes = {
+UserPage.propTypes = {
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired
 }
 
-export default UserDescription
+export default UserPage

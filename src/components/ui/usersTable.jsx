@@ -1,8 +1,6 @@
 import React from "react"
 import PropTypes from "prop-types"
-import Table from "./table"
-import TableHeader from "./teableHeader"
-import TableBody from "./tableBody"
+import Table, { TableHeader, TableBody } from "../common/table"
 
 const UserTable = ({ users, onSort, selectedSort, columns, ...rest }) => {
     return (

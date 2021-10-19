@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react"
-import Pagination from "./pagination"
-import { paginate } from "../utils/paginate"
-import GroupList from "./groupList"
-import api from "../api"
-import SearchStatus from "./searchStatus"
-import UserTable from "./usersTable"
+import Pagination from "../../common/pagination"
+import { paginate } from "../../../utils/paginate"
+import GroupList from "../../common/groupList"
+import api from "../../../api"
+import SearchStatus from "../../ui/searchStatus"
+import UserTable from "../../ui/usersTable"
 import _ from "lodash"
-import Bookmark from "./bookmark"
-import QualitiesList from "./qualitiesList"
+import Bookmark from "../../common/bookmark"
+import Qualities from "../../ui/qualities"
 import { Link } from "react-router-dom"
-import SearchRow from "./SearchRow"
+import SearchRow from "../../ui/searchRow"
 
-const Users = () => {
+const UserListPage = () => {
     const [users, setUsers] = useState()
     const [searchString, setSearchString] = useState("")
 
@@ -91,7 +91,7 @@ const Users = () => {
         },
         qualities: {
             name: "Качества",
-            component: (user) => <QualitiesList qualities={user.qualities} />
+            component: (user) => <Qualities qualities={user.qualities} />
         },
         profession: {
             name: "Проффесия",
@@ -181,4 +181,4 @@ const Users = () => {
     )
 }
 
-export default Users
+export default UserListPage

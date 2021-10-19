@@ -1,6 +1,6 @@
 import React from "react"
 import Bookmark from "./bookmark"
-import Qualitie from "./qualitie"
+import Qualities from "./qualities"
 import PropTypes from "prop-types"
 
 const User = ({ user, onDelete, onBookmarkToggle }) => {
@@ -8,9 +8,7 @@ const User = ({ user, onDelete, onBookmarkToggle }) => {
         <tr>
             <td>{user.name}</td>
             <td>
-                {user.qualities.map((quality) => (
-                    <Qualitie quality={quality} key={quality._id} />
-                ))}
+                <Qualities qualities={user.qualities} />
             </td>
             <td>{user.profession.name}</td>
             <td>{user.completedMeetings}</td>

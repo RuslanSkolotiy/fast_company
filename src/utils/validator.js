@@ -3,26 +3,31 @@ export function validator(formData, config) {
     function validate(vlidateMethod, value, config) {
         let statusValidate
         switch (vlidateMethod) {
-        case "isRequired":
-            statusValidate = value.trim() === ""
-            break
-        case "isEmail":
-            statusValidate = !/^\S+@\S+\.\S+$/.test(value)
-            break
-        case "hasCapitalSymbol":
-            statusValidate = !/[A-Z]+/.test(value)
-            break
-        case "hasNumber":
-            statusValidate = !/\d+/.test(value)
-            break
-        case "minLength":
-            statusValidate = value.length < config.value
-            break
-        case "maxLength":
-            statusValidate = value.length > config.value
-            break
-        default:
-            break
+            case "isRequired":
+                if (typeof value === "boolean") {
+                    statusValidate = !value
+                } else {
+                    statusValidate = value.trim() === ""
+                }
+
+                break
+            case "isEmail":
+                statusValidate = !/^\S+@\S+\.\S+$/.test(value)
+                break
+            case "hasCapitalSymbol":
+                statusValidate = !/[A-Z]+/.test(value)
+                break
+            case "hasNumber":
+                statusValidate = !/\d+/.test(value)
+                break
+            case "minLength":
+                statusValidate = value.length < config.value
+                break
+            case "maxLength":
+                statusValidate = value.length > config.value
+                break
+            default:
+                break
         }
         if (statusValidate) return config.message
     }
