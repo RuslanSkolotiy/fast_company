@@ -8,6 +8,7 @@ import UserEditPage from "../components/page/userEditPage"
 const UsersPage = ({ mode }) => {
     const params = useParams()
     const { userID } = params
+    console.log("mode", mode)
     switch (mode) {
         case "view":
             return <UserPage id={userID} />

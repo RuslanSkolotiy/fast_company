@@ -10,26 +10,26 @@ import Bookmark from "../../common/bookmark"
 import Qualities from "../../ui/qualities"
 import { Link } from "react-router-dom"
 import SearchRow from "../../ui/searchRow"
+import { useUser } from "../../../hooks/useUsers"
+import Profession from "../../ui/profession"
 
 const UserListPage = () => {
-    const [users, setUsers] = useState()
+    const { users } = useUser()
     const [searchString, setSearchString] = useState("")
 
     const onDelete = (userId) => {
-        setUsers(users.filter((user) => user._id !== userId))
+        console.log(userId)
+        // setUsers(users.filter((user) => user._id !== userId))
     }
 
-    useEffect(() => {
-        api.users.fetchAll().then((result) => setUsers(result))
-    }, [])
-
     const onBookmarkToggle = (userId) => {
-        const newUsers = [...users]
-        const userIndex = newUsers.findIndex((user) => user._id === userId)
-        newUsers[userIndex].marked = !newUsers[userIndex].marked
-            ? true
-            : undefined
-        setUsers(newUsers)
+        console.log(userId)
+        /* const newUsers = [...users]
+         const userIndex = newUsers.findIndex((user) => user._id === userId)
+         newUsers[userIndex].marked = !newUsers[userIndex].marked
+             ? true
+             : undefined
+         setUsers(newUsers) */
     }
 
     const onPage = 6
@@ -53,7 +53,6 @@ const UserListPage = () => {
         : users
 
     filteredUsers = filteredUsers.filter((item) => {
-        console.log(item.name)
         return item.name.toLowerCase().includes(searchString.toLowerCase())
     })
 
@@ -95,7 +94,7 @@ const UserListPage = () => {
         },
         profession: {
             name: "Проффесия",
-            path: "profession.name"
+            component: (user) => <Profession id={user.profession} />
         },
         completedMeetings: {
             name: "Встретился, раз",

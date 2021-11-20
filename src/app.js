@@ -4,6 +4,10 @@ import MainPage from "./loyout/mainPage"
 import LoginPage from "./loyout/loginPage"
 import UsersPage from "./loyout/usersPage"
 import MainMenu from "./components/ui/mainMenu"
+import { ToastContainer } from "react-toastify"
+import { ProfessionProvider } from "./hooks/useProfessions"
+import { UserProvider } from "./hooks/useUsers"
+import { QualitiesProvider } from "./hooks/useQualities"
 
 const App = () => {
     return (
@@ -12,20 +16,36 @@ const App = () => {
                 <MainMenu />
                 <Switch>
                     <Route path="/" exact component={MainPage} />
-                    <Route path="/login/:type?" component={LoginPage} />
-                    <Route
-                        path="/users/:userID/edit"
-                        component={() => UsersPage({ mode: "edit" })}
-                    />
-                    <Route
-                        path="/users/:userID"
-                        component={() => UsersPage({ mode: "view" })}
-                    />
-                    <Route
-                        path="/users/"
-                        component={() => UsersPage({ mode: "list" })}
-                    />
+                    <QualitiesProvider>
+                        <ProfessionProvider>
+                            <Route path="/login/:type?" component={LoginPage} />
+                            <UserProvider>
+                                <Route
+                                    path="/users/:userID/edit"
+                                    exact={true}
+                                    component={() =>
+                                        UsersPage({ mode: "edit" })
+                                    }
+                                />
+                                <Route
+                                    path="/users/:userID"
+                                    exact={true}
+                                    component={() =>
+                                        UsersPage({ mode: "view" })
+                                    }
+                                />
+                                <Route
+                                    path="/users/"
+                                    exact={true}
+                                    component={() =>
+                                        UsersPage({ mode: "list" })
+                                    }
+                                />
+                            </UserProvider>
+                        </ProfessionProvider>
+                    </QualitiesProvider>
                 </Switch>
+                <ToastContainer />
             </BrowserRouter>
         </>
     )
