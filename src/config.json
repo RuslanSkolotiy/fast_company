@@ -1,3 +1,5 @@
 {
-  "apiEndPoint": "http://localhost:4000/api/v1/"
+  "apiEndPoint": "https://fast-company-firebase-3a6d5-default-rtdb.europe-west1.firebasedatabase.app/",
+  "apiKey": "AIzaSyAlgViW1bWDO4wckkA71N-CcOLdaXifATg",
+  "isFireBase": true
 }

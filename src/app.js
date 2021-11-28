@@ -8,43 +8,50 @@ import { ToastContainer } from "react-toastify"
 import { ProfessionProvider } from "./hooks/useProfessions"
 import { UserProvider } from "./hooks/useUsers"
 import { QualitiesProvider } from "./hooks/useQualities"
+import { AuthProvider } from "./hooks/useAuth"
+import "react-toastify/dist/ReactToastify.css"
 
 const App = () => {
     return (
         <>
             <BrowserRouter>
-                <MainMenu />
-                <Switch>
-                    <Route path="/" exact component={MainPage} />
-                    <QualitiesProvider>
-                        <ProfessionProvider>
-                            <Route path="/login/:type?" component={LoginPage} />
-                            <UserProvider>
+                <AuthProvider>
+                    <MainMenu />
+                    <Switch>
+                        <Route path="/" exact component={MainPage} />
+                        <QualitiesProvider>
+                            <ProfessionProvider>
                                 <Route
-                                    path="/users/:userID/edit"
-                                    exact={true}
-                                    component={() =>
-                                        UsersPage({ mode: "edit" })
-                                    }
+                                    path="/login/:type?"
+                                    component={LoginPage}
                                 />
-                                <Route
-                                    path="/users/:userID"
-                                    exact={true}
-                                    component={() =>
-                                        UsersPage({ mode: "view" })
-                                    }
-                                />
-                                <Route
-                                    path="/users/"
-                                    exact={true}
-                                    component={() =>
-                                        UsersPage({ mode: "list" })
-                                    }
-                                />
-                            </UserProvider>
-                        </ProfessionProvider>
-                    </QualitiesProvider>
-                </Switch>
+                                <UserProvider>
+                                    <Route
+                                        path="/users/:userID/edit"
+                                        exact={true}
+                                        component={() =>
+                                            UsersPage({ mode: "edit" })
+                                        }
+                                    />
+                                    <Route
+                                        path="/users/:userID"
+                                        exact={true}
+                                        component={() =>
+                                            UsersPage({ mode: "view" })
+                                        }
+                                    />
+                                    <Route
+                                        path="/users/"
+                                        exact={true}
+                                        component={() =>
+                                            UsersPage({ mode: "list" })
+                                        }
+                                    />
+                                </UserProvider>
+                            </ProfessionProvider>
+                        </QualitiesProvider>
+                    </Switch>
+                </AuthProvider>
                 <ToastContainer />
             </BrowserRouter>
         </>

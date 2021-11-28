@@ -2,9 +2,14 @@ import React, { useEffect, useState } from "react"
 import TextField from "../common/form/textField"
 import { validator } from "../../utils/validator"
 import CheckboxField from "../common/form/checkboxField"
+import { useAuth } from "../../hooks/useAuth"
+import { toast } from "react-toastify"
+import { useHistory } from "react-router-dom"
 // import * as yup from "yup"
 
 const LoginForm = () => {
+    const history = useHistory()
+    const { signIn } = useAuth()
     const [formData, setFormData] = useState({
         email: "",
         password: "",
@@ -15,11 +20,18 @@ const LoginForm = () => {
     const changeHandler = ({ name, value }) => {
         setFormData((prevState) => ({ ...prevState, [name]: value }))
     }
-    const handleSubmit = (event) => {
+
+    const handleSubmit = async (event) => {
         event.preventDefault()
 
         if (validate()) {
-            console.log(formData)
+            try {
+                await signIn(formData)
+                console.log("logIn OK")
+                history.push("/")
+            } catch (e) {
+                toast.error(e.error)
+            }
         }
     }
 

@@ -1,13 +1,21 @@
 import React, { useEffect, useState } from "react"
 import TextField from "../common/form/textField"
 import { validator } from "../../utils/validator"
-import api from "../../api"
 import SelectField from "../common/form/selectField"
 import RadioField from "../common/form/radioField"
 import MultiSelectField from "../common/form/multiSelectField"
 import CheckboxField from "../common/form/checkboxField"
+import { useQualities } from "../../hooks/useQualities"
+import { useProfession } from "../../hooks/useProfessions"
+import { useAuth } from "../../hooks/useAuth"
+import { useHistory } from "react-router-dom"
 
 const RegisterForm = () => {
+    const history = useHistory()
+    const { signUp } = useAuth()
+    const { professions } = useProfession()
+    const { qualities } = useQualities()
+
     const [formData, setFormData] = useState({
         email: "",
         password: "",
@@ -17,22 +25,29 @@ const RegisterForm = () => {
         license: false
     })
     const [errors, setErrors] = useState({})
-    const [professions, setProfessions] = useState([])
-    const [qualities, setQualities] = useState([])
 
-    useEffect(() => {
-        api.professions.fetchAll().then((result) => setProfessions(result))
-        api.qualities.fetchAll().then((result) => setQualities(result))
-    }, [])
+    const qualitiesList = qualities.map((q) => ({
+        label: q.name,
+        value: q._id
+    }))
 
     const changeHandler = ({ name, value }) => {
         setFormData((prevState) => ({ ...prevState, [name]: value }))
     }
-    const handleSubmit = (event) => {
-        event.preventDefault()
 
+    const handleSubmit = async (event) => {
+        event.preventDefault()
         if (validate()) {
-            console.log(formData)
+            const newData = {
+                ...formData,
+                qualities: formData.qualities.map((q) => q.value)
+            }
+            try {
+                await signUp(newData)
+                history.push("/")
+            } catch (e) {
+                setErrors(e)
+            }
         }
     }
 
@@ -129,7 +144,7 @@ const RegisterForm = () => {
             />
 
             <MultiSelectField
-                options={qualities}
+                options={qualitiesList}
                 onChange={changeHandler}
                 name="qualities"
                 label="Qualities"
