@@ -6,10 +6,12 @@ import UsersPage from "./loyout/usersPage"
 import MainMenu from "./components/ui/mainMenu"
 import { ToastContainer } from "react-toastify"
 import { ProfessionProvider } from "./hooks/useProfessions"
-import { UserProvider } from "./hooks/useUsers"
+
 import { QualitiesProvider } from "./hooks/useQualities"
 import { AuthProvider } from "./hooks/useAuth"
 import "react-toastify/dist/ReactToastify.css"
+import ProtectedRoute from "./components/common/protectedRoute"
+import LogoutPage from "./loyout/logoutPage"
 
 const App = () => {
     return (
@@ -25,29 +27,13 @@ const App = () => {
                                     path="/login/:type?"
                                     component={LoginPage}
                                 />
-                                <UserProvider>
-                                    <Route
-                                        path="/users/:userID/edit"
-                                        exact={true}
-                                        component={() =>
-                                            UsersPage({ mode: "edit" })
-                                        }
-                                    />
-                                    <Route
-                                        path="/users/:userID"
-                                        exact={true}
-                                        component={() =>
-                                            UsersPage({ mode: "view" })
-                                        }
-                                    />
-                                    <Route
-                                        path="/users/"
-                                        exact={true}
-                                        component={() =>
-                                            UsersPage({ mode: "list" })
-                                        }
-                                    />
-                                </UserProvider>
+                                <Route path="/logout" component={LogoutPage} />
+
+                                <ProtectedRoute
+                                    path="/users/:userID?/:edit?"
+                                    exact={true}
+                                    component={UsersPage}
+                                />
                             </ProfessionProvider>
                         </QualitiesProvider>
                     </Switch>

@@ -1,4 +1,5 @@
 import httpService from "./httpService"
+import localStorageService from "./localStorageService"
 
 const userEndPoint = "user/"
 
@@ -21,6 +22,11 @@ const userService = {
     },
     delete: async (id) => {
         const { data } = await httpService.delete(userEndPoint + id)
+        return data
+    },
+    getCurrentUser: async () => {
+        const id = localStorageService.getUserId()
+        const { data } = await httpService.get(userEndPoint + id)
         return data
     }
 }

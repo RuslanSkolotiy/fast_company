@@ -1,31 +1,39 @@
 import React, { useEffect, useState } from "react"
 import PropTypes from "prop-types"
-import api from "../../../api"
 import { useHistory } from "react-router"
 import TextField from "../../common/form/textField"
 import { validator } from "../../../utils/validator"
 import SelectField from "../../common/form/selectField"
 import MultiSelectField from "../../common/form/multiSelectField"
 import RadioField from "../../common/form/radioField"
+import { useProfession } from "../../../hooks/useProfessions"
+import { useQualities } from "../../../hooks/useQualities"
+import { useUser } from "../../../hooks/useUsers"
+import { useAuth } from "../../../hooks/useAuth"
 
 const UserEditPage = ({ id }) => {
-    const [formData, setFormData] = useState()
-    const [professions, setProfessions] = useState([])
-    const [qualities, setQualities] = useState([])
     const history = useHistory()
+    const { getUserById } = useUser()
+    const { updateUser, currentUser } = useAuth()
+    const { reloadUsers } = useUser()
+    if (currentUser._id !== id) {
+        setTimeout(() => {
+            history.push(`/users/${currentUser._id}/edit`)
+        })
+    }
+    const [formData, setFormData] = useState(getUserById(id))
+    const { professions, isLoading: isProfessionsLoading } = useProfession()
+    const { qualities, isLoading: isQualitiesLoading } = useQualities()
+
     const [errors, setErrors] = useState({})
+
+    useEffect(() => {
+        setFormData(getUserById(id))
+    }, [id])
 
     useEffect(() => {
         validate()
     }, [formData])
-
-    useEffect(() => {
-        api.users.getById(id).then((result) => {
-            setFormData(result)
-        })
-        api.professions.fetchAll().then((result) => setProfessions(result))
-        api.qualities.fetchAll().then((result) => setQualities(result))
-    }, [])
 
     const validarotConfig = {
         name: {
@@ -51,23 +59,17 @@ const UserEditPage = ({ id }) => {
     const isValid = Object.keys(errors).length === 0
 
     const changeHandler = ({ name, value }) => {
-        if (name === "profession") {
-            value = professions.find((profession) => profession._id === value)
-        }
         if (name === "qualities") {
-            value = value.map((item) =>
-                Object.values(qualities).find(
-                    (quality) => quality._id === item.value
-                )
-            )
+            value = value.map((item) => item.value)
         }
         setFormData((prevState) => ({ ...prevState, [name]: value }))
     }
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault()
 
         if (validate()) {
-            api.users.update(id, formData)
+            await updateUser(formData)
+            await reloadUsers()
             goBackHandler()
         }
     }
@@ -76,7 +78,9 @@ const UserEditPage = ({ id }) => {
         history.push("/users/" + id + "")
     }
 
-    if (!formData) return <>Loading...</>
+    if (!formData || isProfessionsLoading || isQualitiesLoading) {
+        return <>Loading...</>
+    }
 
     return (
         <>
@@ -102,7 +106,7 @@ const UserEditPage = ({ id }) => {
                     <SelectField
                         label="Profession"
                         name="profession"
-                        value={formData.profession._id}
+                        value={formData.profession}
                         onChange={changeHandler}
                         options={professions.map((profession) => ({
                             name: profession.name,
@@ -117,19 +121,24 @@ const UserEditPage = ({ id }) => {
                             { name: "Female", value: "female" },
                             { name: "Other", value: "other" }
                         ]}
-                        value={formData.sex}
+                        value={formData.sex || "other"}
                         onChange={changeHandler}
                         name="sex"
                         label="Sex"
                     />
                     <MultiSelectField
-                        options={qualities}
+                        options={qualities.map((item) => ({
+                            label: item.name,
+                            value: item._id
+                        }))}
                         onChange={changeHandler}
                         name="qualities"
                         label="Qualities"
-                        value={formData.qualities.map((quality) => ({
-                            label: quality.name,
-                            value: quality._id
+                        value={formData.qualities.map((qualityId) => ({
+                            label: qualities.find(
+                                (item) => item._id === qualityId
+                            ).name,
+                            value: qualityId
                         }))}
                     />
                     <button

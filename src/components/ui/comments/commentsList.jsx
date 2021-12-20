@@ -1,8 +1,14 @@
 import React from "react"
 import Comment from "./comment"
-import PropTypes from "prop-types"
+import { useComments } from "../../../hooks/useComments"
 
-const CommentsList = ({ comments, onDeleteComment }) => {
+const CommentsList = () => {
+    const { comments } = useComments()
+    const { removeComment } = useComments()
+    const onDeleteCommentHandler = (id) => {
+        removeComment(id)
+    }
+
     return (
         <div className="card mb-3">
             <div className="card-body">
@@ -14,9 +20,7 @@ const CommentsList = ({ comments, onDeleteComment }) => {
                         <Comment
                             comment={comment}
                             key={comment._id}
-                            onDeleteClick={() => {
-                                onDeleteComment(comment._id)
-                            }}
+                            onDeleteClick={onDeleteCommentHandler}
                         />
                     ))}
             </div>
@@ -24,9 +28,6 @@ const CommentsList = ({ comments, onDeleteComment }) => {
     )
 }
 
-CommentsList.propTypes = {
-    comments: PropTypes.array.isRequired,
-    onDeleteComment: PropTypes.func.isRequired
-}
+CommentsList.propTypes = {}
 
 export default CommentsList

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react"
 import Pagination from "../../common/pagination"
 import { paginate } from "../../../utils/paginate"
 import GroupList from "../../common/groupList"
-import api from "../../../api"
 import SearchStatus from "../../ui/searchStatus"
 import UserTable from "../../ui/usersTable"
 import _ from "lodash"
@@ -12,15 +11,13 @@ import { Link } from "react-router-dom"
 import SearchRow from "../../ui/searchRow"
 import { useUser } from "../../../hooks/useUsers"
 import Profession from "../../ui/profession"
+import { useProfession } from "../../../hooks/useProfessions"
+import { useAuth } from "../../../hooks/useAuth"
 
 const UserListPage = () => {
     const { users } = useUser()
     const [searchString, setSearchString] = useState("")
-
-    const onDelete = (userId) => {
-        console.log(userId)
-        // setUsers(users.filter((user) => user._id !== userId))
-    }
+    const { currentUser } = useAuth()
 
     const onBookmarkToggle = (userId) => {
         console.log(userId)
@@ -34,7 +31,7 @@ const UserListPage = () => {
 
     const onPage = 6
     const [currentPage, setCurrentPage] = useState(1)
-    const [professions, setProfessions] = useState()
+    const { professions, isLoading: isProfessionsLoading } = useProfession()
     const [selectedProf, setSelectedProf] = useState()
     const [sortBy, setSortBy] = useState({ sort: "name", order: "asc" })
 
@@ -42,19 +39,17 @@ const UserListPage = () => {
         setCurrentPage(1)
     }, [selectedProf])
 
-    useEffect(() => {
-        api.professions.fetchAll().then((result) => setProfessions(result))
-    }, [])
-
     if (!users) return "Loding..."
 
     let filteredUsers = selectedProf
         ? users.filter((user) => user.profession._id === selectedProf._id) // ? allUsers.filter((user) => _.isEqual(user.profession, selectedProf))
         : users
 
-    filteredUsers = filteredUsers.filter((item) => {
-        return item.name.toLowerCase().includes(searchString.toLowerCase())
-    })
+    filteredUsers = filteredUsers
+        .filter((item) => {
+            return item.name.toLowerCase().includes(searchString.toLowerCase())
+        })
+        .filter((item) => item._id !== currentUser._id)
 
     const count = filteredUsers.length
 
@@ -110,20 +105,6 @@ const UserListPage = () => {
             component: (user) => (
                 <Bookmark user={user} onToggle={onBookmarkToggle} />
             )
-        },
-        delete: {
-            name: "",
-            component: (user) => (
-                <button
-                    onClick={() => {
-                        onDelete(user._id)
-                    }}
-                    data-id={user._id}
-                    className="btn btn-danger"
-                >
-                    Delete
-                </button>
-            )
         }
     }
 
@@ -138,7 +119,7 @@ const UserListPage = () => {
     return (
         <>
             <div className="d-flex">
-                {professions && (
+                {professions && !isProfessionsLoading && (
                     <div className="d-flex flex-column flex-shrink-0 p-3">
                         <GroupList
                             selectedItem={selectedProf}

@@ -33,8 +33,12 @@ export const UserProvider = ({ children }) => {
         setError(null)
     }, [error])
 
-    const getUser = (id) => {
+    const getUserById = (id) => {
         return users.find((user) => user._id === id)
+    }
+
+    async function reloadUsers() {
+        return await getUsers()
     }
 
     function errorCatcher(error) {
@@ -47,7 +51,8 @@ export const UserProvider = ({ children }) => {
         <UserContext.Provider
             value={{
                 users,
-                getUser
+                getUserById,
+                reloadUsers
             }}
         >
             {!isLoading ? children : <h1>Loading...</h1>}

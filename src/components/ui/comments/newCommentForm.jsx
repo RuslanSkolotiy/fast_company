@@ -1,36 +1,20 @@
-import React, { useEffect, useState } from "react"
-import api from "../../../api"
-import SelectField from "../../common/form/selectField"
+import React, { useState } from "react"
 import TextareaField from "../../common/form/textareaField"
 import { validator } from "../../../utils/validator"
 import PropTypes from "prop-types"
+import { useComments } from "../../../hooks/useComments"
 
-const NewCommentForm = ({ pageId, onAddMessage }) => {
-    const [formData, setFormData] = useState({
-        user: "",
-        message: ""
-    })
-    const [users, setUsers] = useState([])
+const NewCommentForm = ({ pageId }) => {
+    const [formData, setFormData] = useState({})
     const [errors, setErrors] = useState({})
-
-    useEffect(() => {
-        api.users.fetchAll().then((result) => setUsers(result))
-    }, [])
-
-    useEffect(() => {
-        validate()
-    }, [formData])
+    const { createComment } = useComments()
 
     const changeHandler = ({ name, value }) => {
         setFormData((prevState) => ({ ...prevState, [name]: value }))
+        validate()
     }
 
     const validarotConfig = {
-        user: {
-            isRequired: {
-                message: "User is required"
-            }
-        },
         message: {
             isRequired: {
                 message: "Message is required"
@@ -47,15 +31,11 @@ const NewCommentForm = ({ pageId, onAddMessage }) => {
     const handleSubmit = (event) => {
         event.preventDefault()
         if (validate()) {
-            onAddMessage({
+            createComment({
                 pageId: pageId,
-                userId: formData.user,
                 content: formData.message
             })
-            setFormData({
-                user: "",
-                message: ""
-            })
+            setFormData({})
         }
     }
 
@@ -65,21 +45,10 @@ const NewCommentForm = ({ pageId, onAddMessage }) => {
                 <div>
                     <h2>New comment</h2>
                     <form onSubmit={handleSubmit}>
-                        <SelectField
-                            name="user"
-                            value={formData.user}
-                            onChange={changeHandler}
-                            options={users.map((user) => ({
-                                name: user.name,
-                                value: user._id
-                            }))}
-                            defaultOption="Select user"
-                            error={errors.user}
-                        />
                         <TextareaField
                             label="Message"
                             name="message"
-                            value={formData.message}
+                            value={formData.message || ""}
                             onChange={changeHandler}
                             error={errors.message}
                         />
@@ -98,8 +67,7 @@ const NewCommentForm = ({ pageId, onAddMessage }) => {
 }
 
 NewCommentForm.propTypes = {
-    pageId: PropTypes.string,
-    onAddMessage: PropTypes.func.isRequired
+    pageId: PropTypes.string
 }
 
 export default NewCommentForm

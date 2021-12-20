@@ -21,6 +21,7 @@ const RegisterForm = () => {
         password: "",
         profession: "",
         sex: "male",
+        name: "",
         qualities: [],
         license: false
     })
@@ -62,6 +63,11 @@ const RegisterForm = () => {
             },
             isEmail: {
                 message: "Email is incorected"
+            }
+        },
+        name: {
+            isRequired: {
+                message: "Name is required"
             }
         },
         password: {
@@ -110,6 +116,13 @@ const RegisterForm = () => {
                 value={formData.email}
                 onChange={changeHandler}
                 error={errors?.email}
+            />
+            <TextField
+                label="Name"
+                name="name"
+                value={formData.name}
+                onChange={changeHandler}
+                error={errors?.name}
             />
             <TextField
                 label="Password"

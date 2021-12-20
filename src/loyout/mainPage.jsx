@@ -4,7 +4,6 @@ import useMockData from "../utils/mockData"
 const MainPage = () => {
     const { error, initialize, progress, status } = useMockData()
     const onClickHandler = () => {
-        console.log("Clicked")
         initialize()
     }
     return (

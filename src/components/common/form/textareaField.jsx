@@ -15,7 +15,7 @@ const TextareaField = ({ label, name, value, onChange, rows, error }) => {
 
             <textarea
                 className={
-                    "form-control" + (!error ? " is-valid" : " is-invalid")
+                    "form-control" + (!error ? " " : " is-invalid")
                 }
                 id={name}
                 name={name}

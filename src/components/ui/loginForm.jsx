@@ -27,8 +27,11 @@ const LoginForm = () => {
         if (validate()) {
             try {
                 await signIn(formData)
-                console.log("logIn OK")
-                history.push("/")
+                history.push(
+                    history.location.state.from.pathname
+                        ? history.location.state.from.pathname
+                        : "/"
+                )
             } catch (e) {
                 toast.error(e.error)
             }
