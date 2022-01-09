@@ -2,39 +2,33 @@ import React, { useEffect, useState } from "react"
 import TextField from "../common/form/textField"
 import { validator } from "../../utils/validator"
 import CheckboxField from "../common/form/checkboxField"
-import { useAuth } from "../../hooks/useAuth"
-import { toast } from "react-toastify"
 import { useHistory } from "react-router-dom"
+import { useDispatch, useSelector } from "react-redux"
+import { getAuthError, login } from "../../store/users"
 // import * as yup from "yup"
 
 const LoginForm = () => {
     const history = useHistory()
-    const { signIn } = useAuth()
+    const dispatch = useDispatch()
     const [formData, setFormData] = useState({
         email: "",
         password: "",
         rememberMe: false
     })
     const [errors, setErrors] = useState({})
+    const loginError = useSelector(getAuthError())
 
     const changeHandler = ({ name, value }) => {
         setFormData((prevState) => ({ ...prevState, [name]: value }))
     }
 
-    const handleSubmit = async (event) => {
+    const handleSubmit = (event) => {
         event.preventDefault()
-
+        const redirect = history?.location?.state?.from?.pathname
+            ? history.location.state.from.pathname
+            : "/"
         if (validate()) {
-            try {
-                await signIn(formData)
-                history.push(
-                    history?.location?.state?.from?.pathname
-                        ? history.location.state.from.pathname
-                        : "/"
-                )
-            } catch (e) {
-                toast.error(e.error)
-            }
+            dispatch(login({ payload: formData, redirect }))
         }
     }
 
@@ -125,6 +119,7 @@ const LoginForm = () => {
             >
                 Remember me
             </CheckboxField>
+            {loginError && <p className="text-danger">{loginError}</p>}
             <button
                 disabled={!isValid}
                 className="btn btn-primary w-100 mx-auto"

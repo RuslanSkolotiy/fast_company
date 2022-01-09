@@ -2,12 +2,16 @@ import React, { useState } from "react"
 import TextareaField from "../../common/form/textareaField"
 import { validator } from "../../../utils/validator"
 import PropTypes from "prop-types"
-import { useComments } from "../../../hooks/useComments"
+import { useDispatch, useSelector } from "react-redux"
+import { getCurrentUserId } from "../../../store/users"
+import { createComment } from "../../../store/comments"
 
 const NewCommentForm = ({ pageId }) => {
     const [formData, setFormData] = useState({})
     const [errors, setErrors] = useState({})
-    const { createComment } = useComments()
+
+    const currentUserId = useSelector(getCurrentUserId())
+    const dispatch = useDispatch()
 
     const changeHandler = ({ name, value }) => {
         setFormData((prevState) => ({ ...prevState, [name]: value }))
@@ -31,10 +35,13 @@ const NewCommentForm = ({ pageId }) => {
     const handleSubmit = (event) => {
         event.preventDefault()
         if (validate()) {
-            createComment({
-                pageId: pageId,
-                content: formData.message
-            })
+            dispatch(
+                createComment({
+                    userId: currentUserId,
+                    pageId,
+                    content: formData.message
+                })
+            )
             setFormData({})
         }
     }

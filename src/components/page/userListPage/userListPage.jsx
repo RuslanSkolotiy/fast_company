@@ -9,15 +9,18 @@ import Bookmark from "../../common/bookmark"
 import Qualities from "../../ui/qualities"
 import { Link } from "react-router-dom"
 import SearchRow from "../../ui/searchRow"
-import { useUser } from "../../../hooks/useUsers"
 import Profession from "../../ui/profession"
-import { useProfession } from "../../../hooks/useProfessions"
-import { useAuth } from "../../../hooks/useAuth"
+import { useSelector } from "react-redux"
+import {
+    getProfessions,
+    getProfessionsLoadingStatus
+} from "../../../store/professions"
+import { getCurrentUserId, getUsers } from "../../../store/users"
 
 const UserListPage = () => {
-    const { users } = useUser()
+    const users = useSelector(getUsers())
     const [searchString, setSearchString] = useState("")
-    const { currentUser } = useAuth()
+    const currentUserId = useSelector(getCurrentUserId())
 
     const onBookmarkToggle = (userId) => {
         console.log(userId)
@@ -31,7 +34,8 @@ const UserListPage = () => {
 
     const onPage = 6
     const [currentPage, setCurrentPage] = useState(1)
-    const { professions, isLoading: isProfessionsLoading } = useProfession()
+    const professions = useSelector(getProfessions())
+    const isProfessionsLoading = useSelector(getProfessionsLoadingStatus())
     const [selectedProf, setSelectedProf] = useState()
     const [sortBy, setSortBy] = useState({ sort: "name", order: "asc" })
 
@@ -40,16 +44,14 @@ const UserListPage = () => {
     }, [selectedProf])
 
     if (!users) return "Loding..."
-
     let filteredUsers = selectedProf
-        ? users.filter((user) => user.profession._id === selectedProf._id) // ? allUsers.filter((user) => _.isEqual(user.profession, selectedProf))
+        ? users.filter((user) => user.profession === selectedProf._id) // ? allUsers.filter((user) => _.isEqual(user.profession, selectedProf))
         : users
-
     filteredUsers = filteredUsers
         .filter((item) => {
             return item.name.toLowerCase().includes(searchString.toLowerCase())
         })
-        .filter((item) => item._id !== currentUser._id)
+        .filter((item) => item._id !== currentUserId)
 
     const count = filteredUsers.length
 

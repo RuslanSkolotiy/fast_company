@@ -6,30 +6,38 @@ import { validator } from "../../../utils/validator"
 import SelectField from "../../common/form/selectField"
 import MultiSelectField from "../../common/form/multiSelectField"
 import RadioField from "../../common/form/radioField"
-import { useProfession } from "../../../hooks/useProfessions"
-import { useQualities } from "../../../hooks/useQualities"
-import { useUser } from "../../../hooks/useUsers"
-import { useAuth } from "../../../hooks/useAuth"
+import { useDispatch, useSelector } from "react-redux"
+import {
+    getQualities,
+    getQualitiesLoadingStatus
+} from "../../../store/qualities"
+import {
+    getProfessions,
+    getProfessionsLoadingStatus
+} from "../../../store/professions"
+import {
+    getCurrentUserData,
+    getUserById,
+    updateUser
+} from "../../../store/users"
 
 const UserEditPage = ({ id }) => {
     const history = useHistory()
-    const { getUserById } = useUser()
-    const { updateUser, currentUser } = useAuth()
-    const { reloadUsers } = useUser()
+
+    const dispatch = useDispatch()
+    const currentUser = useSelector(getCurrentUserData())
     if (currentUser._id !== id) {
         setTimeout(() => {
             history.push(`/users/${currentUser._id}/edit`)
         })
     }
-    const [formData, setFormData] = useState(getUserById(id))
-    const { professions, isLoading: isProfessionsLoading } = useProfession()
-    const { qualities, isLoading: isQualitiesLoading } = useQualities()
-
+    const user = useSelector(getUserById(id))
+    const [formData, setFormData] = useState(user)
+    const professions = useSelector(getProfessions())
+    const isProfessionsLoading = useSelector(getProfessionsLoadingStatus())
+    const qualities = useSelector(getQualities())
+    const isQualitiesLoading = useSelector(getQualitiesLoadingStatus())
     const [errors, setErrors] = useState({})
-
-    useEffect(() => {
-        setFormData(getUserById(id))
-    }, [id])
 
     useEffect(() => {
         validate()
@@ -68,8 +76,8 @@ const UserEditPage = ({ id }) => {
         event.preventDefault()
 
         if (validate()) {
+            dispatch(updateUser(formData))
             await updateUser(formData)
-            await reloadUsers()
             goBackHandler()
         }
     }
