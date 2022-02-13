@@ -18,11 +18,10 @@ const padding = (value, count) => {
     return String(value).padStart(count, "0")
 }
 
-export const dateFormat = (timestamp) => {
-    timestamp = Number(timestamp)
+export const dateFormat = (dateString) => {
     const now = new Date()
-    const date = new Date(timestamp)
-    const diff = Math.floor((now.getTime() - timestamp) / 1000 / 60)
+    const date = new Date(dateString)
+    const diff = Math.floor((now.getTime() - date.getTime()) / 1000 / 60)
 
     if (diff < 1) {
         return "1 минуту назад"

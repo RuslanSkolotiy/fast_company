@@ -5,7 +5,7 @@ const userEndPoint = "user/"
 
 const userService = {
     update: async (id, content) => {
-        const { data } = await httpService.put(userEndPoint + id, content)
+        const { data } = await httpService.patch(userEndPoint + id, content)
         return data
     },
     get: async (id) => {

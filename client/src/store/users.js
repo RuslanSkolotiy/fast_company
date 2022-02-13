@@ -2,7 +2,6 @@ import { createSlice } from "@reduxjs/toolkit"
 import userService from "../services/userService"
 import authService from "../services/authService"
 import localStorageService, { setTokens } from "../services/localStorageService"
-import { randomInt } from "../utils/random"
 import history from "../utils/history"
 import { generateAuthError } from "../utils/generateAuthError"
 
@@ -46,13 +45,6 @@ const userSlice = createSlice({
         authRequestFiled: (state, action) => {
             state.error = action.payload
         },
-        userCreateRequested: () => {},
-        userCreated: (state, action) => {
-            state.entities.push(action.payload)
-        },
-        userCreateFiled: (state, action) => {
-            state.error = action.payload
-        },
         userUpdateRequested: () => {},
         userUpdated: (state, action) => {
             const index = state.entities.findIndex(
@@ -82,25 +74,12 @@ const {
     authRequested,
     authRequestSuccess,
     authRequestFiled,
-    userCreateRequested,
-    userCreated,
-    userCreateFiled,
     userLoggedOut,
     userUpdateRequested,
     userUpdated,
     userUpdateFiled
 } = actions
 
-const createUser = (payload) => async (dispatch) => {
-    dispatch(userCreateRequested())
-    try {
-        const { content } = await userService.update(payload._id, payload)
-        dispatch(userCreated(content))
-        history.push("/users")
-    } catch (error) {
-        dispatch(userCreateFiled(error.message))
-    }
-}
 export const updateUser = (payload) => async (dispatch) => {
     dispatch(userUpdateRequested())
     try {
@@ -117,7 +96,7 @@ export const login = ({ payload, redirect }) => {
         try {
             const data = await authService.login({ email, password })
             setTokens(data)
-            dispatch(authRequestSuccess({ userId: data.localId }))
+            dispatch(authRequestSuccess({ userId: data.userId }))
             history.push(redirect)
         } catch (error) {
             const { code, message } = error.response.data.error
@@ -131,22 +110,14 @@ export const login = ({ payload, redirect }) => {
     }
 }
 
-export const signUp = ({ email, password, ...rest }) => {
+export const signUp = (payload) => {
     return async (dispatch) => {
         try {
             dispatch(authRequested())
-            const data = await authService.register({ email, password })
+            const data = await authService.register(payload)
             setTokens(data)
-            dispatch(authRequestSuccess({ userId: data.localId }))
-            dispatch(
-                createUser({
-                    _id: data.localId,
-                    email,
-                    rate: randomInt(1, 5),
-                    completedMeetings: randomInt(0, 200),
-                    ...rest
-                })
-            )
+            dispatch(authRequestSuccess({ userId: data.userId }))
+            history.push("/users")
         } catch (error) {
             dispatch(authRequestFiled(error.message))
         }

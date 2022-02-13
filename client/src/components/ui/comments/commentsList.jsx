@@ -29,7 +29,7 @@ const CommentsList = ({ pageId }) => {
                 <hr />
                 {!isLoading &&
                     [...comments]
-                        .sort((a, b) => b.created_at - a.created_at)
+                        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
                         .map((comment) => (
                             <Comment
                                 comment={comment}

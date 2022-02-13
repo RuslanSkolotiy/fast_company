@@ -3,10 +3,6 @@ import httpService from "./httpService"
 const commentEndPoint = "comment/"
 
 const commentService = {
-    update: async (id, content) => {
-        const { data } = await httpService.put(commentEndPoint + id, content)
-        return data
-    },
     get: async (id) => {
         const { data } = await httpService.get(commentEndPoint + id)
         return data
@@ -17,7 +13,7 @@ const commentService = {
     },
     fetchByPage: async (id) => {
         const { data } = await httpService.get(commentEndPoint, {
-            params: { orderBy: `"pageId"`, equalTo: `"${id}"` }
+            params: { orderBy: "pageId", equalTo: id }
         })
         return data
     },
