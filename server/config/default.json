@@ -1,0 +1,6 @@
+{
+  "port": 8080,
+  "mongoUri": "mongodb+srv://demo:demo@cluster0.avyfj.mongodb.net/fastCompany?retryWrites=true&w=majority",
+  "accessSecret": "secret",
+  "refreshSecret": "secret2"
+}
